@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 # Verificaciones iniciales
 
 print_step "Verificando requisitos previos"

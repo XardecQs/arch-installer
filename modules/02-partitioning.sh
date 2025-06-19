@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Particionado y formateo
 
 print_step "Particionando disco $DISK"
@@ -38,8 +38,17 @@ umount /mnt
 print_step "Montando subvolúmenes"
 mount -o rw,subvol=@,space_cache=v2 "${DISK}3" /mnt
 mkdir -p /mnt/{boot,home,tmp}
+
+# Asegurar que /boot esté montado antes de crear /boot/efi
 mount "${DISK}2" /mnt/boot
 mkdir -p /mnt/boot/efi
 mount "${DISK}1" /mnt/boot/efi
+
 mount -o rw,subvol=@home,space_cache=v2 "${DISK}3" /mnt/home
 mount -o rw,subvol=@tmp,space_cache=v2 "${DISK}3" /mnt/tmp
+
+# Verificar montaje de EFI
+print_step "Verificando montaje de EFI"
+if ! mount | grep -q "${DISK}1"; then
+    error_exit "La partición EFI no está montada correctamente"
+fi
