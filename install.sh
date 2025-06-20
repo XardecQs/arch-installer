@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# set -euo pipefail
+
 source lib/config.sh
 source lib/utils.sh
 
@@ -18,9 +20,9 @@ fi
 #/────────────────────────────────────────────/#
 
 show_banner
-initial_disclaimer
+#initial_disclaimer
 select_disk
-confirm_dangerous_action "Esta operación borrará TODOS los datos en $(ms_green $DISK) \nNo podrás recuperar ningún archivo después de continuar" "BORRAR TODOS LOS DATOS"
+#confirm_dangerous_action "Esta operación borrará TODOS los datos en $(ms_green $DISK) \nNo podrás recuperar ningún archivo después de continuar" "BORRAR TODOS LOS DATOS"
 echo ""
 echo -e "Instalando $(ms_blue "Arch Linux") en el disco $(ms_green $DISK)..."
 
@@ -40,7 +42,7 @@ fi
 ms_green "Creando particiones en $DISK..."
 
 # Calcular tamaños
-TOTAL_SIZE=$(parted -s "$DISK" unit MiB print | grep "Disk /" | awk '{print $3}' | tr -d 'MiB')
+TOTAL_SIZE=$(parted -s "$DISK" unit MiB print | grep "$DISK" | awk '{print $3}' | tr -d 'MiB')
 SWAP_SIZE=$(free -m | awk '/Mem:/ {print $2}') # Tamaño swap = RAM en MiB
 ROOT_END=$((TOTAL_SIZE - SWAP_SIZE))
 
@@ -71,12 +73,12 @@ cd /
 umount /mnt
 
 # Montar subvolúmenes
-mount -o rw,subvol=@,space_cache=v2 "${DISK}3" /mnt
+mount -o rw,subvol=@,compress=zstd,space_cache=v2 "${DISK}3" /mnt
 mkdir -p /mnt/{boot,home,tmp}
 mount "${DISK}2" /mnt/boot
 mkdir -p /mnt/boot/efi
 mount "${DISK}1" /mnt/boot/efi
-mount -o rw,subvol=@home,space_cache=v2 "${DISK}3" /mnt/home
+mount -o rw,subvol=@home,compress=zstd,space_cache=v2 "${DISK}3" /mnt/home
 mount -o rw,subvol=@tmp,space_cache=v2 "${DISK}3" /mnt/tmp
 
 #/────────────────────────────────────────────/#
@@ -109,4 +111,4 @@ echo -e "${GREEN}\n¡Instalación completada con éxito!${NC}"
 echo -e "${YELLOW}El sistema se reiniciará en 10 segundos...${NC}"
 echo -e "Puedes cancelar con Ctrl+C"
 sleep 10
-shutdown -r now
+#shutdown -r now
